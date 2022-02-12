@@ -13,12 +13,12 @@ using namespace std;
 
 int countBits(unsigned long long);
 long findMissing(vector<long>);
-string stockSummary(vector<string>, vector<string>);
+string stockSummary(vector<string> &a, vector<string> &b);
 
 int main(void) {
 
-    std::vector<std::string> art = {"ABAR 200", "CDXE 500", "BKWR 250", "BTSQ 890", "DRTY 600"};
-    std::vector<std::string> cd = {"A", "B"};
+    std::vector<std::string> art = {"ROXANNE 102", "RHODODE 123", "BKWRKAA 125", "BTSQZFG 239", "DRTYMKH 060"};
+    std::vector<std::string> cd = {"B", "R", "D", "X"};
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -27,6 +27,20 @@ int main(void) {
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     std::cout << duration.count()*1.0 / 100 << " seconds" << std::endl;
+
+}
+
+vector<int> sortArray(vector<int> array) {
+
+    bool loopVar = false;
+    while (!loopVar) {
+
+        for (int i = 0; i < array.size() - 1; i++) {
+            int value = array[i];
+            int forwardValue = array[i + 1];
+        }
+
+    }
 
 }
 
@@ -71,7 +85,11 @@ long findMissing(vector<long> theList) {
 
 };
 
-string stockSummary(vector<string> listOfArt, vector<string> categories) {
+string stockSummary(vector<string> &listOfArt, vector<string> &categories) {
+
+    for (int i = 0; i < categories.size(); i++) {
+        cout << "Value : " << categories[i] << endl;
+    }
 
     map<string, int> amounts;
     for (int i = 0; i < categories.size(); i++) {
@@ -89,10 +107,19 @@ string stockSummary(vector<string> listOfArt, vector<string> categories) {
                 }
             }
         }
+        if (amounts.count(categories[i]) == 0) {
+            amounts[categories[i]] = 0;
+        }
     }
+    
     string s;
-    for (map<string,int>::iterator it = amounts.begin(); it != amounts.end(); ++it) {
-        s += "(" + it->first + " : " + to_string(it->second) + ")";
+    for (int i = 0, count = 0; i < categories.size(); i++, count++) {
+        if (count == (categories.size() - 1)) {
+            // do not add - on end
+            s += "(" + categories[i] + " : " + to_string(amounts[categories[i]]) + ")";
+        } else {
+            s += "(" + categories[i] + " : " + to_string(amounts[categories[i]]) + ") - ";
+        }
     }
     return s;
 }
