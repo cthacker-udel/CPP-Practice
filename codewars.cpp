@@ -7,22 +7,22 @@
 #include <set>
 #include <list>
 #include <map>
+#include <sstream>
 using namespace std::chrono;
 using namespace std;
 
 int countBits(unsigned long long);
 long findMissing(vector<long>);
+string stockSummary(vector<string>, vector<string>);
 
 int main(void) {
 
-    vector<long> testList;
-    testList.push_back(1);
-    testList.push_back(3);
-    testList.push_back(7);
+    std::vector<std::string> art = {"ABAR 200", "CDXE 500", "BKWR 250", "BTSQ 890", "DRTY 600"};
+    std::vector<std::string> cd = {"A", "B"};
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    std::cout << findMissing(testList) << std::endl;
+    std::cout << stockSummary(art, cd) << std::endl;
 
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
@@ -40,7 +40,7 @@ int countBits(unsigned long long n) {
     return count;
 }
 
-static long findMissing(vector<long> theList) {
+long findMissing(vector<long> theList) {
     
     for (int i = 0; i < (int)theList.size(); i++) {
         cout << theList[i];
@@ -70,3 +70,29 @@ static long findMissing(vector<long> theList) {
     return -1;
 
 };
+
+string stockSummary(vector<string> listOfArt, vector<string> categories) {
+
+    map<string, int> amounts;
+    for (int i = 0; i < categories.size(); i++) {
+        for (int j = 0; j < listOfArt.size(); j++) {
+            string artPiece = listOfArt[j];
+            if (artPiece.substr(0, 1) == categories[i]) {
+                int amt;
+                std::stringstream string_amt(artPiece.substr(artPiece.find(" ") + 1, string::npos));
+                string_amt >> amt;
+                if (amounts.count(categories[i]) > 0) {
+                    // in map
+                    amounts[categories[i]] += amt;
+                } else {
+                    amounts[categories[i]] = amt;
+                }
+            }
+        }
+    }
+    string s;
+    for (map<string,int>::iterator it = amounts.begin(); it != amounts.end(); ++it) {
+        s += "(" + it->first + " : " + to_string(it->second) + ")";
+    }
+    return s;
+}
