@@ -1,4 +1,4 @@
-all:
+all: clean build run
 
 build: codewars.cpp
 	g++ -o codewars.exe codewars.cpp
