@@ -10,6 +10,8 @@
 #include <sstream>
 #include <array>
 #include <string.h>
+#include <bitset>
+#include <algorithm>
 using namespace std::chrono;
 using namespace std;
 
@@ -204,15 +206,172 @@ char * sortTheInnerContent(const char* words, int length) {
 
 }
 
+vector<string> dup(vector<string> strArray) {
+
+    for (int i = 0; i < strArray.size(); i++) {
+        string theString = strArray[i];
+        string newString = "";
+        for (int j = 0; j < theString.length() - 1; j += 2) {
+            char letter1 = theString[j];
+            char letter2 = theString[j + 1];
+            if (letter1 == letter2 && newString[newString.length() - 1] != letter1) {
+                newString += letter1;
+                continue;
+            } if (letter1 != letter2 && newString[newString.length() - 1] != letter1) {
+                newString += letter1;
+            } if (letter2 != letter1 && newString[newString.length() - 1] != letter2) {
+                newString += letter2;
+            }
+        }
+        if (newString != "" && theString[theString.length() - 1] != newString[newString.length() - 1]) {
+            newString += theString[theString.length() - 1];
+        }
+        strArray[i] = newString;
+    }
+    return strArray;
+
+
+}
+
+bool pairCompare(pair<int, int>&a, pair<int, int>&b) {
+    if (a.second == b.second) {
+        return a.first < b.first;
+    }
+    return a.second > b.second;
+}
+
+vector<int> solve(const vector<int> &vec) {
+
+    map<int, int> frequencies;
+    for (int i = 0; i < (int)vec.size(); i++) {
+        int elem = vec[i];
+        if (frequencies.count(elem) > 0) {
+            // contains key
+            frequencies[elem] = frequencies[elem] + 1;
+        } else {
+            frequencies[elem] = 1;
+        }
+    }
+    vector<pair<int, int>> pairs;
+    for (pair<int, int> eachpair: frequencies) {
+        pairs.push_back(eachpair);
+    }
+    sort(pairs.begin(), pairs.end(), pairCompare);
+    vector<int> sortedPairs;
+    for (pair<int, int> eachpair: pairs) {
+        int amount = eachpair.second;
+        for (int i = 0; i < amount; i++) {
+            sortedPairs.push_back(eachpair.first);
+        }
+    }
+    return sortedPairs;;
+
+}
+
+bool isPrime(long long number) {
+
+    if (number <= 3) {
+        return true;
+    } else if (number % 2 == 0 || number % 3 == 0 || number % 5 == 0) {
+        return false;
+    } else {
+        for (long long i = 4; i < sqrt(number) + 1; i++) {
+            if (number % i == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+}
+
+long long sumProperDivisor(long long n) {
+
+    long long origN = n;
+    long long total = 1;
+    long long start = 2;
+    map<int, int> factors;
+    while (n > 1) {
+        if (n % start == 0) {
+            while (n % start == 0) {
+                factors[start] += 1;
+                n /= start;
+            }
+            start = 2;
+            continue;
+        }
+        start++;
+    }
+    long subtotal = 1;
+    long power = 1;
+    for (pair<int,int> eachpair: factors) {
+        for (int i = 0; i < eachpair.second; i++) {
+            subtotal += pow(eachpair.first, power++);
+        }
+        total *= subtotal;
+        subtotal = 1;
+        power = 1;
+    }
+    total -= origN;
+
+    return total;
+
+}
+
+string buddy(long long start, long long limit) {
+
+    for (long long i = start; i < limit; i++) {
+        long long sum_i = sumProperDivisor(i);
+        long long sum_i_result = sumProperDivisor(sum_i - 1);
+        if ((sum_i_result - 1) == i) {
+            return "(" + to_string(i) + " " + to_string(sum_i - 1) + ")";
+        }
+    }
+    return "Nothing";
+
+}
+
+int isThreeFive(int num) {
+    return num % 3 == 0 && num % 5 == 0;
+}
+
+int solution(int number) {
+    cout << "testing " << number << endl;
+    if (number < 0) {
+        return 0;
+    }
+        // 3 6 9 12 15 18
+    // 5 10
+    set<int> additions;
+    int threeNum = 3;
+    int fiveNum = 5;
+    int total = 0;
+    while (threeNum < number || fiveNum < number) {
+        if (threeNum < number) {
+            additions.insert(threeNum);
+            threeNum += 3;
+        }
+        if (fiveNum < number) {
+            additions.insert(fiveNum);
+            fiveNum += 5;
+        }
+    }
+    for (set<int>::iterator it = additions.begin(); it != additions.end(); ++it) {
+        total += *it;
+    }
+    return total;
+
+}
+
 
 int main(void) {
 
-    char *letters = "sort content";
-    int len = 12;    
-
     auto start = std::chrono::high_resolution_clock::now();
 
-    cout << sortTheInnerContent(letters, len) << endl;
+    cout << solution(20) << endl;
+    // 3 6 9 12 15 18
+    // 5 10
+    // 78
 
     auto stop = high_resolution_clock::now();
     std::cout << std::endl;
