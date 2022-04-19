@@ -12,6 +12,9 @@
 #include <string.h>
 #include <bitset>
 #include <algorithm>
+#include <unordered_map>
+#include <thread>
+#include <mutex>
 using namespace std::chrono;
 using namespace std;
 
@@ -31,6 +34,7 @@ vector<int> sortArray(vector<int> array) {
         }
 
     }
+    return array;
 
 }
 
@@ -363,19 +367,612 @@ int solution(int number) {
 
 }
 
+void printRandValues() {
+
+    int min = 1;
+    int max = 20;
+
+    for (int i = 0; i < 1000000; i++) {
+        int randNumber = (rand() % (max - 1)) + 1;
+        if (randNumber == 0 || randNumber == 20) {
+            cout << "found rand with " << randNumber << endl;
+        }
+    }
+}
+
+vector<vector<int>> create_spiral(int n) {
+
+    int arr[n][n];
+    const char directions[] = {'r', 'd', 'l', 'u'};
+    int currDirection = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            arr[i][j] = -1;
+        }
+    }
+    int row = 0;
+    int col = 0;
+    int currNumber = 1;
+    int neg1Count = n * n;
+    while (neg1Count > 0) {
+
+        char theCurrDirection = directions[currDirection];
+        if (theCurrDirection == 'r') {
+            if (col == (n - 1)) {
+                arr[row++][col] = currNumber++;
+                currDirection++;
+                neg1Count--;
+                continue;
+            } else {
+                if (arr[row][col + 1] != -1) {
+                    arr[row++][col] = currNumber++;
+                    currDirection++;
+                    neg1Count--;
+                    continue;
+                } else {
+                    arr[row][col++] = currNumber++;
+                    neg1Count--;
+                }
+            }
+        } else if (theCurrDirection == 'd') {
+            if (row == n - 1) {
+                arr[row][col--] = currNumber++;
+                currDirection++;
+                neg1Count--;
+                continue;
+            } else {
+                if (arr[row + 1][col] != -1) {
+                    arr[row][col--] = currNumber++;
+                    currDirection++;
+                    neg1Count--;
+                    continue;
+                } else {
+                    arr[row++][col] = currNumber++;
+                    neg1Count--;
+                }
+            }
+        } else if (theCurrDirection == 'l') {
+            if (col == 0) {
+                arr[row--][col] = currNumber++;
+                currDirection++;
+                neg1Count--;
+                continue;
+            } else {
+                if (arr[row][col - 1] != -1) {
+                    arr[row--][col] = currNumber++;
+                    currDirection++;
+                    neg1Count--;
+                    continue;
+                } else {
+                    arr[row][col--] = currNumber++;
+                    neg1Count--;
+                }
+            }
+        } else {
+            if (row == 0) {
+                arr[row][col++] = currNumber++;
+                currDirection = 0;
+                neg1Count--;
+                continue;
+            } else {
+                if (arr[row - 1][col] != -1) {
+                    arr[row][col++] = currNumber++;
+                    currDirection = 0;
+                    neg1Count--;
+                    continue;
+                } else {
+                    arr[row--][col] = currNumber++;
+                    neg1Count--;
+                }
+            }
+        }
+    }
+    
+    vector<vector<int>> nested_spiral;
+    vector<int> subsprial;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            subsprial.push_back(arr[i][j]);
+        }
+        nested_spiral.push_back(subsprial);
+        subsprial.clear();
+    }
+    return nested_spiral;
+
+}
+
+string grid2(int n) {
+
+    string result = "";
+    string alpha = "abcdefghijklmnopqrstuvwxyz";
+    int index = 0;
+    int baseIndex = 0;
+    for (int i = 0; i < n; i++) {
+        index = baseIndex;
+        for (int times = 0; times < n; times++) {
+            result += alpha[index++];
+            if (times < (n - 1)) {
+                result += " ";
+            }
+            if (index == 26) {
+                index = 0;
+            }
+        }
+        if (i < n - 1) {
+            result += "\n";
+        }
+        baseIndex++;
+        if (baseIndex == 26) {
+            baseIndex = 0;
+        }
+    }
+    cout << result << endl;
+    return result;
+
+
+}
+
+string grid(int n) {
+
+    
+    string alpha = "abcdefghijklmnopqrstuvwxyz";
+
+    if (n <= 0) {
+        return "";
+    } else if (n == 1) {
+        return string(1,alpha[0]);
+    }
+
+    char grid[n][n];
+    int index = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            grid[j][i] = alpha[index++];
+            if (index == 26) {
+                index = 0;
+            }
+        }
+    }
+
+    int col = 0;
+    for (int i = 0; i < n; i++) {
+        char starter = grid[i][col];
+        int n_index = alpha.find(starter);
+        if (n_index == 25) {
+            n_index = 0;
+        } else {
+            n_index++;
+        }
+        for (int j = 1; j < n; j++) {
+            grid[i][j] = alpha[n_index];
+            n_index += 1;
+            if (n_index == 26) {
+                n_index = 0;
+            }
+        }
+    }
+
+    string result = "";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            //cout << grid[i][j] << " ";
+            if (j == (n - 1)) {
+                result += grid[i][j];
+                if (i != (n - 1)) {
+                    result += "\n";
+                }
+            } else {
+                result += grid[i][j];
+                result +=  " ";
+            }
+        }
+        //cout << endl;
+
+    }
+    return result;
+
+}
+
+vector<int> remove_values(vector<int> integers, vector<int> values) {
+
+    vector<int> newArray;
+    string numbers = "";
+    for (int i = 0; i < values.size(); i++) {
+        numbers += to_string(values[i]);
+    }
+    for (int i = 0; i < integers.size(); i++) {
+        string theDigit = to_string(integers[i]);
+        if (numbers.find(theDigit) == string::npos) {
+            newArray.push_back(integers[i]);
+        }
+    }
+    return newArray;
+
+}
+
+string phone(const string& orgdr, string num) {
+
+    string token = "";
+    string dirCopy = orgdr.substr(0);
+    while (dirCopy.find('\n') != string::npos) {
+        int index = dirCopy.find('\n');
+        string theSub = dirCopy.substr(0, dirCopy.find('\n'));
+        cout << "the sub = " << theSub << endl;
+        bool foundPhone = false;
+        bool foundName = false;
+        bool foundAddress = false;
+        string validCharacters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        string theName = "";
+        string theAddress = "";
+        string thePhone = "";
+        for (int i = 0; i < theSub.length(); i++) {
+            char theLetter = theSub[i];
+            if (foundPhone && theLetter != ' ') {
+                thePhone += theLetter;
+            } else if (foundName && theLetter != '>') {
+                theName += theLetter;
+            } else if (foundName && theLetter == '>') {
+                foundName = false;
+            } else if (foundPhone && theLetter == ' ') {
+                foundPhone = false;
+            } else if (!foundPhone && !foundName && foundAddress) {
+                theAddress += theLetter;
+            } else if (theLetter == '+') {
+                foundPhone = true;
+            } else if (theLetter == '<') {
+                foundName = true;
+            } else if (validCharacters.find(theLetter) != string::npos) {
+                foundAddress = true;
+            } else {
+                continue;
+            }
+        }
+        cout << "the name = " << theName << " and the address = " << theAddress << " and the phone == " << thePhone << endl;
+    }
+    return "";
+}
+
+bool isNumber(string theCommand) {
+
+    try {
+        int result = stoi(theCommand);
+        return true;
+    } catch (...) {
+        return false;
+    }
+    return true;
+
+}
+
+void print_map_keys(unordered_map<string, int> theMap) {
+
+    cout << "themap contains = " << endl;
+    for (auto it = theMap.begin(); it != theMap.end(); ++it) {
+        cout << " " << it->first << " : " << it->second << endl; 
+    }
+
+}
+
+
+unordered_map<string, int> assembler(const vector<string>& program) {
+
+    unordered_map<string, int> the_registers;
+
+    stringstream ss;
+    string eachcommand;
+    string _register;
+    int i = 0;
+    while (i < (int)program.size()) {
+        int index = 0;
+        string command = program[i];
+        cout << "the command = [" << command << "]" << endl;
+        if (command.find("mov") != string::npos) {
+            // found mov
+            ss = stringstream(command);
+            while (ss >> eachcommand) {
+                if (eachcommand == "mov") {
+                    index++;
+                    continue; 
+                } else {
+                    if (index == 1) {
+                        // register
+                        if (the_registers.count(eachcommand) == 0) {
+                            the_registers[eachcommand] = 0;
+                        }
+                        _register = eachcommand;
+                        index++;
+                    } else {
+                        // value to move into it
+                        the_registers[_register] = isNumber(eachcommand) ? stoi(eachcommand) : the_registers[eachcommand];
+                    }
+                }
+            }
+            i++;
+        } else if (command.find("inc") != string::npos) {
+            // found inc
+            ss = stringstream(command);
+            while (ss >> eachcommand) {
+                if (eachcommand == "inc") {
+                    index++;
+                    continue;
+                } else {
+                    if (the_registers.count(eachcommand) == 0) {
+                        the_registers[eachcommand] = 1;
+                    } else {
+                        the_registers[eachcommand] = the_registers[eachcommand] + 1;
+                    }
+                }
+            }
+            i++;
+        } else if (command.find("dec") != string::npos) {
+            // found dec
+            ss = stringstream(command);
+            while (ss >> eachcommand) {
+                if (eachcommand == "dec") {
+                    index++;
+                    continue;
+                } else {
+                    if (the_registers.count(eachcommand) == 0) {
+                        the_registers[eachcommand] = 0;
+                    } else {
+                        the_registers[eachcommand] = the_registers[eachcommand] - 1;
+                    }
+                }
+            }
+            i++;
+        } else if (command.find("jnz") != string::npos) {
+            // found jnz
+            ss = stringstream(command);
+            string the_jnz_reg;
+            int amt_jump;
+            bool is_number = false;
+            int is_number_reg = 0;
+            while (ss >> eachcommand) {
+                if (eachcommand == "jnz") {
+                    index++;
+                    continue;
+                } else {
+                    if (index == 1) {
+                        if (isNumber(eachcommand)) {
+                            // is a number
+                            is_number = true;
+                            is_number_reg = stoi(eachcommand);
+                        } else {
+                            the_jnz_reg = eachcommand;
+                        }
+                        index++;
+                    } else {
+                        amt_jump = stoi(eachcommand);
+                    }
+                }
+            }
+            if (!is_number && the_registers[the_jnz_reg] != 0) {
+                i += amt_jump;
+            } else if (is_number && is_number_reg == 0) {
+                i += amt_jump;
+            } else {
+                i++;
+            }
+        }
+    }
+
+    return the_registers;
+
+}
+
+int maxTotal = 0;
+mutex maxTotalMutex;
+
+void printIntVector(vector<int> values) {
+    for (int i = 0; i < values.size(); i++) {
+        cout << "values[" << i << "] = " << values[i] << ", ";
+    }
+    cout << endl;
+}
+
+void calcMax(vector<int> values, int startingIndex) {
+    int total = 0;
+    vector<int> valuesCopy(values);
+    vector<int> adder;
+    for (int i = startingIndex; i < valuesCopy.size() - 3;) {
+        int value1 = valuesCopy[i];
+        int value2 = valuesCopy[i + 1];
+        int value3 = valuesCopy[i + 2];
+        maxTotalMutex.lock();
+        cout << "value1 = " << value1 << " and value2 = " << value2 << " and value3 = " << value3 << " and total = " << total << endl;
+        maxTotalMutex.unlock();
+        if (value1 + value2 + value3 <= 0) {
+            i += 3;
+        } else if (max(max(value1, value2), value3) == value1) {
+
+            total += value1;
+            adder.push_back(value1);
+            i += 2;
+        } else if (max(max(value1, value2), value3) == value2) {
+
+            total += value2;
+            adder.push_back(value2);
+            i++;
+        } else {
+
+            total += value3;
+            adder.push_back(value3);
+            i += 2;
+        }
+        valuesCopy[i + 1] = 0;
+        valuesCopy[i] = 0;
+    }
+    maxTotalMutex.lock();
+    printIntVector(adder);
+    cout << "total = " << total << endl;
+    maxTotal = max(total, maxTotal);
+    maxTotalMutex.unlock();
+}
+
+
+int targetGame(vector<int> values) {
+    vector<thread> theThreads;
+    for (int i = 0; i < values.size(); i++) {
+        thread the_thread(calcMax, values, i);
+        theThreads.push_back(move(the_thread));
+    }
+    for (int i = 0; i < theThreads.size(); i++) {
+        theThreads[i].join();
+    }
+    return maxTotal;
+
+}
+
+string multiply(string a, string b) {
+
+    int len1 = a.size();
+    int len2 = a.size();
+    if (len1 == 0 || len2 == 0) {
+        return "0";
+    }
+
+    vector<int> result(len1 + len2, 0);
+
+    int i_n1 = 0;
+    int i_n2 = 0;
+
+    for (int i = len1 - 1; i >= 0; i--) {
+        int carry = 0;
+        int n1 = a[i] - '0';
+        i_n2 = 0;
+
+        for (int j = len2 - 1; j >= 0; j--) {
+
+            int n2 = a[j] - '0';
+
+            int sum = n1 * n2 + result[i_n1 + i_n2] + carry;
+
+            carry = sum / 10;
+
+            result[i_n1 + i_n2] = sum % 10;
+
+            i_n2++;
+        }
+
+        if (carry > 0) {
+            result[i_n1 + i_n2] += carry;
+        }
+
+        i_n1++;
+    }
+
+    int i = result.size() - 1;
+    while (i >= 0 && result[i] == 0)
+        i--;
+
+    if (i == -1) {
+        return "0";
+    }
+
+    string s = "";
+    while (i >= 0) {
+        s += to_string(result[i--]);
+    }
+    return s;
+
+
+}
+class Node {
+    Node *next;
+    public:
+        Node * getNext() {
+            return next;
+        }
+        void setNext(Node *newNext) {
+            this->next = newNext;
+        }
+};
+
+Node * duplicateNodes(vector<Node*> nodes, Node *theNode) {
+
+    int ct = 0;
+    for (int i = 0; i < nodes.size(); i++) {
+        if (nodes[i] == theNode) {
+            ct++;
+        } else if (ct > 1) {
+            return theNode;
+        }
+    }
+    return ct > 1 ? theNode : NULL;
+}
+
+int findLengthOfLoop(vector<Node*> nodes, const Node *theDuplicate) {
+
+    int l = 0, r = 0;
+    bool foundFirst = false;
+    for (int i = 0; i < nodes.size(); i++) {
+        if (nodes[i] == theDuplicate && !foundFirst) {
+            foundFirst = true;
+            l = i;
+        } else if (nodes[i] == theDuplicate && foundFirst) {
+            r = i;
+            break;
+        }
+    }
+    return r - l;
+}
+
+/**
+ * @brief Get the size of the loop within the linked list
+ * 
+ * @param startNode The node to start the loop from
+ * @return int The size of the loop in the linked list, "loop" being a node that eventually traces back to itself, or -1 if not found or some system error occurs
+ */
+int getLoopSize(Node* startNode)
+{   
+    /**
+     * @brief the count of all the nodes, the key represents the pointer
+     * The first int in the outer pair represents the count, and the inner pair represents the <left, right> index
+     * if the count is 1, then initialize the left to len, and if it is > 1 then initialize right to len, and then take the diff, rather then iterate through the enitre list n times
+     */
+    unordered_map<Node *, pair<int, pair<int, int>>> nodeCounts;
+    /**
+     * @brief The node to start from, which is passed in through the parameter
+     */
+    Node *currentNode = startNode;
+    /**
+     * @brief The length of the loop
+     */
+    int len = 0;
+    do {
+      if (nodeCounts.count(currentNode) > 0) {
+        return len - nodeCounts[currentNode].second.first;
+      } else {
+          pair<int, pair<int,int>> thePair;
+          thePair.first = 1;
+          thePair.second.first = len;
+          thePair.second.second = 0;
+          nodeCounts[currentNode] = thePair;
+      }
+      currentNode = currentNode->getNext();
+      len++;
+    } while (true);
+  return -1;
+}
+
+
+
 
 int main(void) {
+    
+     srand(time(NULL));
+     auto start = std::chrono::high_resolution_clock::now();
+    
+    Node n1, n2, n3, n4;
+    n1.setNext(&n2);
+    n2.setNext(&n3);
+    n3.setNext(&n4);
+    n4.setNext(&n4);
+    Node *startNode = &n1;
+    cout << "the loop size = " << getLoopSize(startNode) << endl;
 
-    auto start = std::chrono::high_resolution_clock::now();
-
-    cout << solution(20) << endl;
-    // 3 6 9 12 15 18
-    // 5 10
-    // 78
-
-    auto stop = high_resolution_clock::now();
-    std::cout << std::endl;
-    auto duration = duration_cast<microseconds>(stop - start);
-    std::cout << duration.count()*1.0 / 100 << " seconds" << std::endl;
+     auto stop = high_resolution_clock::now();
+     auto duration = duration_cast<microseconds>(stop - start);
+     std::cout << ((duration.count()*1.0) / 1000000) << " seconds" << std::endl;
 
 }
