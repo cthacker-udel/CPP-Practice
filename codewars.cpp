@@ -15,6 +15,8 @@
 #include <unordered_map>
 #include <thread>
 #include <mutex>
+#include <forward_list>
+#include <initializer_list>
 using namespace std::chrono;
 using namespace std;
 
@@ -955,6 +957,82 @@ int getLoopSize(Node* startNode)
   return -1;
 }
 
+bool compare(forward_list<int> list1, forward_list<int> list2) {
+    return list1 == list2;
+};
+
+double areaOfPolygonInsideCircle (double circleRadius, int numberOfSides) {
+
+    double theta = 360 / numberOfSides;
+    double theta_radians = theta * 3.14 / 180;
+    double sideLength = 2 * circleRadius * sin(theta_radians / 2);
+    cout << "The sidelength = " << sideLength << endl;
+    return 1.0;
+    
+}   
+
+int solve(const string& eq) {
+
+    cout << "testing = " << eq << endl;
+    string eqCpy = eq;
+    vector<string> splitString;
+    int index = 0;
+    int total = 0;
+    int eqIndex = 0;
+    int xIndex = 0;
+    while (eqCpy.find(" ") != string::npos) {
+        string firstPart = eqCpy.substr(index, eqCpy.find(" "));
+        if (firstPart == "=") {
+            eqIndex = splitString.size();
+        } else if (firstPart == "x") {
+            xIndex = splitString.size();
+        }
+        splitString.push_back(firstPart);
+        eqCpy = eqCpy.substr(eqCpy.find(" ") + 1);
+    }
+    if (eqCpy == "x") {
+        xIndex = splitString.size();
+    }
+    splitString.push_back(eqCpy);
+    bool isLeft = xIndex < eqIndex;
+    bool isPlus = true;
+    for (int i = 0; i < splitString.size(); i++) {
+        if (splitString[i] == "x") {
+            continue;
+        } else if (splitString[i] == "+") {
+            isPlus = true;
+        } else if (splitString[i] == "-") {
+            isPlus = false;
+        } else {
+            cout << "stoiing = " << splitString[i] << endl;
+            // is a number
+            if (isLeft && !isPlus && i < eqIndex) {
+                total += stoi(splitString[i]);
+            } else if (isLeft && isPlus && i < eqIndex) {
+                total -= stoi(splitString[i]);
+            } else if (!isLeft && isPlus && i < eqIndex) {
+                total += stoi(splitString[i]);
+            } else if (!isLeft && !isPlus && i < eqIndex) {
+                total -= stoi(splitString[i]);
+            } else if (isLeft && !isPlus && i > eqIndex) {
+                total -= stoi(splitString[i]);
+            } else if (isLeft && isPlus && i > eqIndex) {
+                total += stoi(splitString[i]);
+            } else if (!isLeft && !isPlus && i > eqIndex) {
+                total += stoi(splitString[i]);
+            } else if (!isLeft && isPlus && i > eqIndex) {
+                total -= stoi(splitString[i]);
+            }
+            isPlus = true;
+        }
+    }
+    if (eq.find("- x") != string::npos) {
+        return -1 * total;
+    }
+    return total;
+
+}
+
 
 
 
@@ -963,13 +1041,7 @@ int main(void) {
      srand(time(NULL));
      auto start = std::chrono::high_resolution_clock::now();
     
-    Node n1, n2, n3, n4;
-    n1.setNext(&n2);
-    n2.setNext(&n3);
-    n3.setNext(&n4);
-    n4.setNext(&n4);
-    Node *startNode = &n1;
-    cout << "the loop size = " << getLoopSize(startNode) << endl;
+    cout << "the result of solve = " << solve("x - 31 - 20 + 55 = + 37 - 30 + 103 - 44 - 23") << endl;
 
      auto stop = high_resolution_clock::now();
      auto duration = duration_cast<microseconds>(stop - start);
