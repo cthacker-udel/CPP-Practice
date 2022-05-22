@@ -17,6 +17,7 @@
 #include <mutex>
 #include <forward_list>
 #include <initializer_list>
+#include <stack>
 using namespace std::chrono;
 using namespace std;
 
@@ -1033,15 +1034,144 @@ int solve(const string& eq) {
 
 }
 
+string sum_strings(string a, string b) {
 
+    int carry = 0;
+    string newNumber = "";
+    int start = a.size() > b.size() ? b.size() - 1 : b.size() > a.size() ? a.size() - 1 : b.size() - 1;
+    for (int i = start; i >= 0; i--) {
 
+        char digit_a = a[i];
+        char digit_b = b[i];
+        int p_a = stoi(string(1, digit_a));
+        int p_b = stoi(string(1, digit_b));
+        int combin = p_a + p_b;
+        if (carry > 0) {
+            combin += carry;
+            if (combin > 9) {
+                carry = 1;
+                newNumber = newNumber + to_string(combin - 10);
+            } else {
+                carry = 0;
+                newNumber = newNumber + to_string(combin);
+            }
+        } else if (combin > 9) {
+            carry = 1;
+                           newNumber = newNumber + to_string(combin - 10);
+        } else {
+            carry = 0;
+                newNumber = newNumber + to_string(combin);
+        }
+    }
+    return newNumber;
+
+}
+
+string DNAtoRNA(string dna) {
+
+    string result = "";
+    transform(dna.begin(), dna.end(), back_inserter(result), [](char eachletter) {
+        cout << "eachletter = " << eachletter << endl;
+        if (eachletter == 'T') {
+            return 'U';
+        } else {
+            return eachletter;
+        }
+    });
+
+    return result;
+
+};
+
+string drawCube(int n) {
+
+    if (n < 1) {
+        return "";
+    } else {
+        int timesBeforeBase = n - 1;
+        int startingLength = n;
+        string theCube = "";
+        string eachSection = "";
+        int totalLength = (n * 2) - 1;
+        int leftStart = n - 1;
+
+        // for spaces on the right when the face of the cube is being drawn
+        int rightSpaces = 0;
+
+        int rightAmount = 0;
+        int leftAmount = n - 1;
+        int middlePivot = totalLength - 1;
+
+        for (int i = 0; i < timesBeforeBase; i++, rightAmount++, leftStart--, middlePivot--) {
+            int leftPivot = leftStart + 1;
+            int rightPivot = totalLength - 2;
+            for (int j = 0; j < totalLength; j++) {
+                if (j < leftStart) {
+                    eachSection += " ";
+                } else if (i == 0) {
+                    eachSection += "#";
+                } else {
+                    if (j == leftPivot - 1) {
+                        eachSection += "#";
+                    } else if (j < middlePivot && rightAmount < leftAmount) {
+                        eachSection += "*";
+                    } else if (j < middlePivot && rightAmount >= leftAmount) {
+                        eachSection += "#";
+                    } else if (j == middlePivot) {
+                        eachSection += "#";
+                    } else if (j > middlePivot && rightAmount == 0) {
+                        eachSection += "#";
+                    } else if (j > middlePivot && rightAmount <= leftPivot) {
+                        eachSection += "#";
+                    }
+                }
+            }
+            eachSection += "\n";
+            startingLength++;
+            
+        }
+    }
+
+}
+
+bool accept_string(string str) {
+
+	stack<char> theStack;
+	for (int i = 0; i < (int)str.length(); i++) {
+		char theChar = str.at(i);
+		if (theChar == ']') {
+			if (theStack.top() == '[') {
+				// valid match, remove
+				theStack.pop();
+			} else {
+				return false;
+			}
+		} else if (theChar == '}') {
+			if (theStack.top() == '{') {
+				theStack.pop();
+			} else {
+				return false;
+			}
+		} else  if (theChar == '[') {
+			theStack.push(theChar);
+		} else if (theChar == '{') {
+			theStack.push(theChar);
+		} else {
+			return false;
+		}
+	}
+	return theStack.size() == 0;
+
+}
 
 int main(void) {
     
      srand(time(NULL));
      auto start = std::chrono::high_resolution_clock::now();
     
-    cout << "the result of solve = " << solve("x - 31 - 20 + 55 = + 37 - 30 + 103 - 44 - 23") << endl;
+    bool result = accept_string("[[[]]]");
+	string res = result ? "Passed" : "Failed";
+	cout << res << endl;
 
      auto stop = high_resolution_clock::now();
      auto duration = duration_cast<microseconds>(stop - start);
