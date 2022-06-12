@@ -1164,6 +1164,40 @@ bool accept_string(string str) {
 
 }
 
+vector<int> arr(int n = 0) {
+	vector<int> newArr;
+	for (int i = 0; i < n - 1; i++) {
+		newArr.push_back(i);
+	}
+	return newArr;
+}
+
+bool recurPalindrome(string str) {
+	if (str.length() <= 1) {
+		return true;
+	} else {
+		return tolower(str.at(0)) == tolower(str.at(str.length() - 1)) && recurPalindrome(str.substr(1, str.length() - 2));
+	}
+}
+
+bool isPalindrom(const string&str) {
+	return recurPalindrome(str);
+}
+
+vector<string> string_to_array(const string& s) {
+	string emptystring = "";
+	vector<string> words;
+	for (int i = 0; i < s.length(); i++) {
+		char theLetter = s.at(i);
+		if (theLetter == ' ') {
+			words.push_back(emptystring);
+			emptystring = "";
+		} else {
+			emptystring += s.at(i);
+		}
+	}
+}
+
 int main(void) {
     
      srand(time(NULL));
@@ -1171,7 +1205,7 @@ int main(void) {
     
     bool result = accept_string("[[[]]]");
 	string res = result ? "Passed" : "Failed";
-	cout << res << endl;
+	cout << recurPalindrome("Abba") << endl;
 
      auto stop = high_resolution_clock::now();
      auto duration = duration_cast<microseconds>(stop - start);
