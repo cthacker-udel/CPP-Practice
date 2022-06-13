@@ -1164,14 +1164,162 @@ bool accept_string(string str) {
 
 }
 
+vector<int> arr(int n = 0) {
+	vector<int> newArr;
+	for (int i = 0; i < n - 1; i++) {
+		newArr.push_back(i);
+	}
+	return newArr;
+}
+
+bool recurPalindrome(string str) {
+	if (str.length() <= 1) {
+		return true;
+	} else {
+		return tolower(str.at(0)) == tolower(str.at(str.length() - 1)) && recurPalindrome(str.substr(1, str.length() - 2));
+	}
+}
+
+bool isPalindrom(const string&str) {
+	return recurPalindrome(str);
+}
+
+vector<string> string_to_array(const string& s) {
+	string emptystring = "";
+	vector<string> words;
+	for (int i = 0; i < s.length(); i++) {
+		char theLetter = s.at(i);
+		if (theLetter == ' ') {
+			words.push_back(emptystring);
+			emptystring = "";
+		} else {
+			emptystring += s.at(i);
+		}
+	}
+}
+
+bool is_digit(string s) {
+
+	string trimmedLString = "";
+	for (int i = 0; i < s.size(); i++) {
+		if (s.at(i) != ' ') {
+			trimmedLString = s.substr(i, s.length() - i);
+			break;
+		}
+	}
+	string trimmedRString = "";
+	for (int i = trimmedLString.size() - 1; i >= 0; i--) {
+		if (trimmedLString.at(i) != ' ') {
+			trimmedRString = trimmedLString.substr(0, i + 1);
+			break;
+		}
+	}
+	string validChars = "0123456789";
+	int invalidCount = count_if(trimmedRString.begin(), trimmedRString.end(), [validChars](char letter) {
+		if ((letter != '.' && letter != '-') && (letter == ' ' || validChars.find(letter) == string::npos)) {
+			return 1;
+		}
+		return 0;
+	});
+	if (invalidCount > 0) {
+		return false;
+	}
+	int dashCount = count_if(trimmedRString.begin(), trimmedRString.end(), [](char letter){
+		if (letter == '-') {
+			return 1;
+		}
+		return 0;
+	});
+	if (dashCount > 1) {
+		return false;
+	}
+	if (dashCount == 1 && trimmedRString.at(0) != '-') {
+		return false;
+	}
+	int periodCount = count_if(trimmedRString.begin(), trimmedRString.end(), [](char letter){
+		if (letter == '.') {
+			return 1;
+		}
+		return 0;
+	});
+	if (periodCount > 1) {
+		return false;
+	}
+	if (periodCount == 1 && trimmedRString.at(trimmedRString.length() - 1) == '.') {
+		return false;
+	}
+	return true;
+}
+
+double getVolumeOfCubiod(double length, double width, double height) {
+	return length * width * height;
+}
+
+double zero_fuel(uint32_t distance_to_pump, uint32_t mpg, uint32_t fuel_left) {
+	return (mpg * fuel_left) >= distance_to_pump;
+}
+
+vector<int> Encode(string str, int n) {
+
+	string letters = "abcdefghijklmnopqrstuvwxyz";
+	vector<int> charValues;
+	for (int i = 0; i < str.length(); i++) {
+		charValues.push_back(letters.find(str.at(i)));
+	}
+	string convertedNumber = to_string(n);
+	for (int i = 0, j = 0; i < (int)charValues.size(); i++) {
+		if (j == convertedNumber.length()) {
+			j = 0;
+		} else {
+			charValues[i] = charValues[i] + stoi(string(1, convertedNumber.at(j)));
+			j++;
+		}
+	}
+	return charValues;
+}
+
+int solve2(const string &s) {
+	string alphabet = " abcdefghijklmnopqrstuvwxyz";
+	string consonants = "abcdfghjklmnpqrstvwxyz";
+	int max = 0;
+	int tmpMax = 0;
+	for (int i = 0; i < s.length(); i++) {
+		char theLetter = s.at(i);
+		if (consonants.find(theLetter) != string::npos) {
+			// found
+			tmpMax += alphabet.find(theLetter);
+		} else {
+      cout << " in else with tmpMax = " << tmpMax << " and max = " << max << endl;
+			if (tmpMax > max) {
+				max = tmpMax;
+				tmpMax = 0;
+			} else {
+				tmpMax = 0;
+			}
+		}
+	}
+  cout << "returning " << max << endl;
+	return max;
+}
+
+std::vector<int> move_zeroes(const std::vector<int>& input) {
+  vector<int> theZeroes;
+  for (int i = 0; i < input.size(); i++) {
+	  if (input[i] == 0) {
+		  theZeroes.insert(theZeroes.end(), input[i]);
+	  } else {
+		  theZeroes.push_back(input[i]);
+	  }
+  }
+  return theZeroes;
+}
+
 int main(void) {
     
      srand(time(NULL));
      auto start = std::chrono::high_resolution_clock::now();
     
-    bool result = accept_string("[[[]]]");
-	string res = result ? "Passed" : "Failed";
-	cout << res << endl;
+	solve2("catchphrase");
 
      auto stop = high_resolution_clock::now();
      auto duration = duration_cast<microseconds>(stop - start);
