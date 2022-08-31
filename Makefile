@@ -1,10 +1,10 @@
-all: clean build run
+all: clean-win build run
 
-build: codewars.cpp
-	g++ -o codewars.exe codewars.cpp
+build: %.cpp
+	g++ -o $<.exe $<.cpp
 
-run: codewars.exe
-	./codewars.exe
+run:
+	./problem1.exe
 
 clean:
-	rm -rf *.exe
+	del *.exe
