@@ -17,6 +17,7 @@
 #include <mutex>
 #include <forward_list>
 #include <initializer_list>
+#include <stack>
 using namespace std::chrono;
 using namespace std;
 
@@ -1306,68 +1307,298 @@ int solve(const string &eq)
         return -1 * total;
     }
     return total;
+
 }
 
-void sum_two()
-{
+string sum_strings(string a, string b) {
 
-    int x;
-    int y;
-    cin >> x;
-    cin >> y;
-    map<int, int> themap;
-    for (int i = 0; i < x; i++)
-    {
-        int z;
-        cin >> z;
-        if (themap.find(z) != themap.end())
-        {
-            themap.insert(z, themap[z] + 1);
-        }
-        else
-        {
-            themap.insert(z, 1);
+    int carry = 0;
+    string newNumber = "";
+    int start = a.size() > b.size() ? b.size() - 1 : b.size() > a.size() ? a.size() - 1 : b.size() - 1;
+    for (int i = start; i >= 0; i--) {
+
+        char digit_a = a[i];
+        char digit_b = b[i];
+        int p_a = stoi(string(1, digit_a));
+        int p_b = stoi(string(1, digit_b));
+        int combin = p_a + p_b;
+        if (carry > 0) {
+            combin += carry;
+            if (combin > 9) {
+                carry = 1;
+                newNumber = newNumber + to_string(combin - 10);
+            } else {
+                carry = 0;
+                newNumber = newNumber + to_string(combin);
+            }
+        } else if (combin > 9) {
+            carry = 1;
+                           newNumber = newNumber + to_string(combin - 10);
+        } else {
+            carry = 0;
+                newNumber = newNumber + to_string(combin);
         }
     }
-    for (auto i : themap)
-    {
-        if (themap.find(y - i) != themap.end())
-        {
+    return newNumber;
+
+}
+
+string DNAtoRNA(string dna) {
+
+    string result = "";
+    transform(dna.begin(), dna.end(), back_inserter(result), [](char eachletter) {
+        cout << "eachletter = " << eachletter << endl;
+        if (eachletter == 'T') {
+            return 'U';
+        } else {
+            return eachletter;
+        }
+    });
+
+    return result;
+
+};
+
+string drawCube(int n) {
+
+    if (n < 1) {
+        return "";
+    } else {
+        int timesBeforeBase = n - 1;
+        int startingLength = n;
+        string theCube = "";
+        string eachSection = "";
+        int totalLength = (n * 2) - 1;
+        int leftStart = n - 1;
+
+        // for spaces on the right when the face of the cube is being drawn
+        int rightSpaces = 0;
+
+        int rightAmount = 0;
+        int leftAmount = n - 1;
+        int middlePivot = totalLength - 1;
+
+        for (int i = 0; i < timesBeforeBase; i++, rightAmount++, leftStart--, middlePivot--) {
+            int leftPivot = leftStart + 1;
+            int rightPivot = totalLength - 2;
+            for (int j = 0; j < totalLength; j++) {
+                if (j < leftStart) {
+                    eachSection += " ";
+                } else if (i == 0) {
+                    eachSection += "#";
+                } else {
+                    if (j == leftPivot - 1) {
+                        eachSection += "#";
+                    } else if (j < middlePivot && rightAmount < leftAmount) {
+                        eachSection += "*";
+                    } else if (j < middlePivot && rightAmount >= leftAmount) {
+                        eachSection += "#";
+                    } else if (j == middlePivot) {
+                        eachSection += "#";
+                    } else if (j > middlePivot && rightAmount == 0) {
+                        eachSection += "#";
+                    } else if (j > middlePivot && rightAmount <= leftPivot) {
+                        eachSection += "#";
+                    }
+                }
+            }
+            eachSection += "\n";
+            startingLength++;
+            
         }
     }
+
 }
 
-double calcAverage(const vector<int> &values)
-{
-    int sum = 0;
-    return accumulate(values.begin(), values.end(), sum) / values.size();
+bool accept_string(string str) {
+
+	stack<char> theStack;
+	for (int i = 0; i < (int)str.length(); i++) {
+		char theChar = str.at(i);
+		if (theChar == ']') {
+			if (theStack.top() == '[') {
+				// valid match, remove
+				theStack.pop();
+			} else {
+				return false;
+			}
+		} else if (theChar == '}') {
+			if (theStack.top() == '{') {
+				theStack.pop();
+			} else {
+				return false;
+			}
+		} else  if (theChar == '[') {
+			theStack.push(theChar);
+		} else if (theChar == '{') {
+			theStack.push(theChar);
+		} else {
+			return false;
+		}
+	}
+	return theStack.size() == 0;
+
 }
 
-string alphabet_position(const string &text)
-{
-
-    std::string lowerAlpha = "abcdefghijklmnopqrstuvwxyz";
-    std::string upperAlpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    string replacedText = "";
-    for_each(text.begin(), text.end(), [char letter]
-             {
-        if (islower(letter) && lowerAlpha.find(letter) != string::npos) {
-            replacedText += to_string(((int)lowerAlpha.find(letter)) + 1) + " ";
-        } else if (isupper(letter) && upperAlpha.find(letter) != string::npos) {
-            replacedText += to_string(((int)upperAlpha.find(letter)) + 1) + " ";
-        } });
-    return replacedText;
+vector<int> arr(int n = 0) {
+	vector<int> newArr;
+	for (int i = 0; i < n - 1; i++) {
+		newArr.push_back(i);
+	}
+	return newArr;
 }
 
-int main(void)
-{
+bool recurPalindrome(string str) {
+	if (str.length() <= 1) {
+		return true;
+	} else {
+		return tolower(str.at(0)) == tolower(str.at(str.length() - 1)) && recurPalindrome(str.substr(1, str.length() - 2));
+	}
+}
 
-    srand(time(NULL));
-    auto start = std::chrono::high_resolution_clock::now();
+bool isPalindrom(const string&str) {
+	return recurPalindrome(str);
+}
 
-    cout << "the result of solve = " << alphabet_position(",./<>?-_=+ ") << endl;
+vector<string> string_to_array(const string& s) {
+	string emptystring = "";
+	vector<string> words;
+	for (int i = 0; i < s.length(); i++) {
+		char theLetter = s.at(i);
+		if (theLetter == ' ') {
+			words.push_back(emptystring);
+			emptystring = "";
+		} else {
+			emptystring += s.at(i);
+		}
+	}
+}
 
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    std::cout << ((duration.count() * 1.0) / 1000000) << " seconds" << std::endl;
+bool is_digit(string s) {
+
+	string trimmedLString = "";
+	for (int i = 0; i < s.size(); i++) {
+		if (s.at(i) != ' ') {
+			trimmedLString = s.substr(i, s.length() - i);
+			break;
+		}
+	}
+	string trimmedRString = "";
+	for (int i = trimmedLString.size() - 1; i >= 0; i--) {
+		if (trimmedLString.at(i) != ' ') {
+			trimmedRString = trimmedLString.substr(0, i + 1);
+			break;
+		}
+	}
+	string validChars = "0123456789";
+	int invalidCount = count_if(trimmedRString.begin(), trimmedRString.end(), [validChars](char letter) {
+		if ((letter != '.' && letter != '-') && (letter == ' ' || validChars.find(letter) == string::npos)) {
+			return 1;
+		}
+		return 0;
+	});
+	if (invalidCount > 0) {
+		return false;
+	}
+	int dashCount = count_if(trimmedRString.begin(), trimmedRString.end(), [](char letter){
+		if (letter == '-') {
+			return 1;
+		}
+		return 0;
+	});
+	if (dashCount > 1) {
+		return false;
+	}
+	if (dashCount == 1 && trimmedRString.at(0) != '-') {
+		return false;
+	}
+	int periodCount = count_if(trimmedRString.begin(), trimmedRString.end(), [](char letter){
+		if (letter == '.') {
+			return 1;
+		}
+		return 0;
+	});
+	if (periodCount > 1) {
+		return false;
+	}
+	if (periodCount == 1 && trimmedRString.at(trimmedRString.length() - 1) == '.') {
+		return false;
+	}
+	return true;
+}
+
+double getVolumeOfCubiod(double length, double width, double height) {
+	return length * width * height;
+}
+
+double zero_fuel(uint32_t distance_to_pump, uint32_t mpg, uint32_t fuel_left) {
+	return (mpg * fuel_left) >= distance_to_pump;
+}
+
+vector<int> Encode(string str, int n) {
+
+	string letters = "abcdefghijklmnopqrstuvwxyz";
+	vector<int> charValues;
+	for (int i = 0; i < str.length(); i++) {
+		charValues.push_back(letters.find(str.at(i)));
+	}
+	string convertedNumber = to_string(n);
+	for (int i = 0, j = 0; i < (int)charValues.size(); i++) {
+		if (j == convertedNumber.length()) {
+			j = 0;
+		} else {
+			charValues[i] = charValues[i] + stoi(string(1, convertedNumber.at(j)));
+			j++;
+		}
+	}
+	return charValues;
+}
+
+int solve2(const string &s) {
+	string alphabet = " abcdefghijklmnopqrstuvwxyz";
+	string consonants = "abcdfghjklmnpqrstvwxyz";
+	int max = 0;
+	int tmpMax = 0;
+	for (int i = 0; i < s.length(); i++) {
+		char theLetter = s.at(i);
+		if (consonants.find(theLetter) != string::npos) {
+			// found
+			tmpMax += alphabet.find(theLetter);
+		} else {
+      cout << " in else with tmpMax = " << tmpMax << " and max = " << max << endl;
+			if (tmpMax > max) {
+				max = tmpMax;
+				tmpMax = 0;
+			} else {
+				tmpMax = 0;
+			}
+		}
+	}
+  cout << "returning " << max << endl;
+	return max;
+}
+
+std::vector<int> move_zeroes(const std::vector<int>& input) {
+  vector<int> theZeroes;
+  for (int i = 0; i < input.size(); i++) {
+	  if (input[i] == 0) {
+		  theZeroes.insert(theZeroes.end(), input[i]);
+	  } else {
+		  theZeroes.push_back(input[i]);
+	  }
+  }
+  return theZeroes;
+}
+
+int main(void) {
+    
+     srand(time(NULL));
+     auto start = std::chrono::high_resolution_clock::now();
+    
+	solve2("catchphrase");
+
+     auto stop = high_resolution_clock::now();
+     auto duration = duration_cast<microseconds>(stop - start);
+     std::cout << ((duration.count()*1.0) / 1000000) << " seconds" << std::endl;
+
 }
